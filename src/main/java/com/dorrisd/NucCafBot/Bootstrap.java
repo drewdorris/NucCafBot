@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import java.io.File;
@@ -46,7 +47,7 @@ public class Bootstrap {
             e.printStackTrace();
         }
 
-        JDABuilder builder = JDABuilder.createDefault(args[0]);
+        JDABuilder builder = JDABuilder.createDefault(settings.getProperty("discord.token"));
 
         // Disable parts of the cache
         builder.disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE);
@@ -54,12 +55,13 @@ public class Bootstrap {
         builder.setBulkDeleteSplittingEnabled(false);
         // Set activity (like "playing Something")
         builder.setActivity(Activity.listening("Hal's thoughts"));
+        builder.enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT);
 
         JDA jda = builder.build();
-        jda.addEventListener(new MessageEvents());
         jda.updateCommands().addCommands(
                 Commands.slash("destroyhalbot", "halbot will be destroyed")
-        );
+        ).queue();
+        jda.addEventListener(new MessageEvents());
         NucCafBot bot = new NucCafBot(jda);
 
         new Thread(() -> {

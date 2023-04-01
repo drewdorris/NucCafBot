@@ -9,6 +9,9 @@ public class MessageEvents extends ListenerAdapter {
 
     public void onMessageReceived(MessageReceivedEvent event)
     {
+        if (event.getJDA().getSelfUser().getId().equals(event.getAuthor().getId())) {
+            return;
+        }
         if (event.isFromType(ChannelType.PRIVATE))
         {
             System.out.printf("[PM] %s: %s\n", event.getAuthor().getName(),
@@ -20,13 +23,16 @@ public class MessageEvents extends ListenerAdapter {
                     event.getChannel().getName(), event.getMember().getEffectiveName(),
                     event.getMessage().getContentDisplay());
         }
+        if (event.getMessage().getContentDisplay().toLowerCase().contains("hal")) {
+            event.getChannel().sendMessage("Hal").queue();
+        }
     }
 
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         switch (event.getName()) {
             case "destroyhalbot":
                 event.reply("not actually destroying halbot").setEphemeral(true).queue();
-                event.getChannel().sendMessage("DESTROYING HALBOT!!!!");
+                event.getChannel().sendMessage("DESTROYING HALBOT!!!!").queue();
         }
     }
 }
